@@ -1,6 +1,16 @@
 name: Lint and test workflow
 on: [push]
 jobs:
+  security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - name: Run Snyk to check for vulnerabilities
+        uses: snyk/actions/node@master
+        continue-on-error: true
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+
   lints:
     runs-on: ubuntu-latest
     steps:
@@ -9,6 +19,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '18.x'
+          cache: 'npm'
       - run: npm ci
       - run: npm run build --if-present
       - run: npm run lint
@@ -21,6 +32,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '18.x'
+          cache: 'npm'
       - run: npm ci
       - run: npm run build --if-present
       - run: npm run test
